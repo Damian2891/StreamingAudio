@@ -1,0 +1,38 @@
+syntax="proto3";
+package G4_Audio;
+
+//Se definen los mensajes para el servicio de lista de canciones
+message listaCancionesS{}
+message listaCancionesR{
+    repeated string listaCanciones=1;
+}
+
+//Se define los mensajes para obtener los metadatos de un archivo
+message metadatosS{
+    string archivo=1;
+}
+message metadatosR{
+    string filename=1;//Nombre del archivo
+    string codecName=2;//Codec del archivo
+    int32 sampleRate=3;//Tasa de muestreo (sample rate)
+    int32 canales=4;//Número de canales (mono, estéreo, etc.)
+    float duracion=5;//Duración del archivo en segundos
+    int32 bitRate=6;//Bitrate del archivo
+}
+
+//Se definen los mensajes para obtener el audio en formato de chunks 
+message cancionS{
+    string archivo=1;
+}
+message cancionR{
+    bytes cancionB=1;//Chunk de audio en formato binario
+}
+service Audio{
+    rpc getListaCanciones (listaCancionesS) returns (listaCancionesR);
+    rpc getMetadatos (metadatosS) returns (metadatosR);
+    rpc getStreamAudio (stream cancionS) returns (stream cancionR);
+}
+
+//python -m grpc_tools.protoc -I=<directorio_proto> --python_out=<directorio_destino> --grpc_python_out=<directorio_destino> <archivo_proto>
+//python -m grpc_tools.protoc -I="./" --python_out=./gRPC_Proto --grpc_python_out=./gRPC_Proto G4_Audio.proto
+//python -m grpc_tools.protoc -I. --python_out=./gRPC_Proto --grpc_python_out=./gRPC_Proto G4_Audio.proto
